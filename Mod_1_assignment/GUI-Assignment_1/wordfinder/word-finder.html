@@ -2,7 +2,7 @@
 
 <!--
   COLLABORATORS:
-  
+  Yemi Agesin
 -->
 
 <html>
@@ -13,7 +13,7 @@
 <!-- Load any supplemental Javascript libraries here -->
 <script type="text/javascript" src="jquery-1.5.min.js"></script>
 <script type="text/javascript" src="words-small.json"></script>
-
+<!-- <script type="text/javascript" src="words-small.js"></script> -->
 <!-- Uncomment this to get the full 45,407 word dictionary
 <script type="text/javascript" src="words-large.json"></script>
  -->
@@ -29,6 +29,52 @@ $(document).ready(function() {
 	var dict = new Dictionary(words);
 	// Your code here
 
+  let inputBox = document.getElementById("find");
+  let clearButton = document.getElementById("clearButton");
+  let wordCount = document.getElementById("word-count");
+  let selectBox = document.getElementById("words");
+  
+  clearButton.addEventListener("click", () => {
+    inputBox.value = "";
+    populateWordBox(dict.all());
+  })
+
+  const populateWordBox = (coll) => {
+    var length = coll.length;
+    wordCount.textContent = length + " words total";
+
+    $("#words").empty();
+    for (var index in coll) {
+      var word = coll[index];
+      var option = document.createElement("option");
+      option.value = word;
+      option.text = word;
+      selectBox.add(option);
+    }
+  }
+  populateWordBox(dict.all());
+  
+  // MARK: Listener
+  $("#find").bind('input', function() {
+    var value = $(this).val();
+    var searchResult = dict.search(value);
+    populateWordBox(searchResult);
+    if (searchResult.length <= 0) {
+      wordCount.textContent = searchResult.length + " word containing '" + value + "'";
+    } 
+    console.log(searchResult);
+  });
+
+  // MARK: Resize Window  
+  const resizeWordBox = () => {
+    selectBox.style.height = window.innerHeight + "px";
+  }
+  resizeWordBox();
+  
+  window.addEventListener('resize', () => {
+    resizeWordBox();
+  });
+
 });
 
 // ]]>
@@ -41,6 +87,24 @@ html {
     background-color: #eee;
 }
 
+#searchbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#searchbar input {
+  margin-right: 10px;
+}
+
+#words-list {
+  margin-left: 35%;
+}
+
+#words {
+  width: 40%;
+}
+
 </style>
 
 </head>
@@ -50,14 +114,13 @@ html {
   <form>
     <div id="searchbar">
       <label for="find">Find:</label>
-      <input type="text" name="find">
-      <button id="clearbutton" type="button">Clear</button>
+      <input type="text" id="find" name="find">
+      <button id="clearButton" type="button">Clear</button>
     </div>
 
     <div id="words-list">
-      <p>XXX words total</p>
+      <p id="word-count">XXX words total</p>
       <select id="words" name="words" size="18">
-        <option value="a">a</option>
       </select>
     </div>
   </form>
